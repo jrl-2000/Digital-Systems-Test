@@ -1,0 +1,6 @@
+Captured_Response = 1110100110110001 at                 2355  
+Captured_Response = 0010110111001011 at                 3315  
+Captured_Response = 1001001101000101 at                 4275  
+Captured_Response = 1110011110101001 at                 5235  
+Captured_Response = 0000000111111101 at                 6195  
+Captured_Response = 1111100011100011 at                 7155  

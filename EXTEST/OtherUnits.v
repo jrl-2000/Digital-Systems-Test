@@ -1,0 +1,62 @@
+///////////////////////////////////////////////////////////////////
+//		Multiplexer 2 - 1
+///////////////////////////////////////////////////////////////////
+module MUX2_1 (in1, in2, sel, out);
+	input in1, in2, sel;
+	output out;
+	
+	assign out = sel ? in2 : in1;
+	
+endmodule
+
+
+///////////////////////////////////////////////////////////////////
+//		Multiplexer 4 - 1
+///////////////////////////////////////////////////////////////////
+module MUX4_1 (in1, in2, in3, in4, sel, out);
+	
+	input in1, in2, in3, in4;
+	input [1:0] sel;
+	output out;
+	
+	assign out = (sel == 2'b00) ? in1 :
+				 (sel == 2'b01) ? in2 :
+				 (sel == 2'b10) ? in3 : in4;
+				 
+endmodule
+
+
+///////////////////////////////////////////////////////////////////
+//		D FlipFlop
+///////////////////////////////////////////////////////////////////
+module D_FF(D, CLK, RstBar, Q);
+
+	input D, CLK, RstBar;
+	output reg Q;
+
+	always @(posedge CLK or negedge RstBar) begin
+		if(RstBar == 1'b0)
+			Q = 1'b0;
+		else if (CLK == 1'b1)
+			Q = D;
+	end
+	
+endmodule
+
+
+///////////////////////////////////////////////////////////////////
+//		Tri-State
+///////////////////////////////////////////////////////////////////
+module tristate(in, enable, out);
+  
+  input in , enable;
+  output out;
+  
+  assign out = (enable == 1'b1) ? in : 1'bX;
+  
+endmodule
+
+
+
+
+
