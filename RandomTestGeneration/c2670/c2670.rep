@@ -1,0 +1,9 @@
+gates: 1046
+iv: 157
+ov: 64
+i_patterns: 207
+patterns: 129
+faults: 1798
+d_faults: 1772
+r_faults: 16
+time: 0.063
