@@ -1,0 +1,191 @@
+`timescale 1ns/1ps
+/*
+Jonathan Lopez
+Worcester Polytechnic Institute
+ECE 5724 Spring 2024
+Prof. Z. Navabi
+Homework 3: 
+    Test generation with Verilog testbenches
+Simualtor:
+    Siemens (Mentor Graphics) ModelSim Intel FPGA Starter Editon 2020.1
+Synthesizer:
+    Intel Quartus Prime 23.4
+Description:
+    Adjustable Expected Coverage Per Test for the module c5315_net
+*/
+
+// COMMAND 
+//vsim -c -pli "faultCollapsing faultInjection" testbench
+
+module testbench (
+);
+
+parameter numOfFaults = 5350; 
+parameter initialExpFCount = 20; 
+parameter utLimit = 10; 
+parameter desiredCoverage = 99; 
+
+
+reg [1:178]g;
+wire [122:0] o, onet;
+
+reg [8*50:1] wireName;
+reg stuckAtVal; 
+reg [1:178] testVector; 
+reg [1:numOfFaults] detectedListCT, detectedListAT; 
+
+integer faultFile, testFile, status, faultFile1; 
+integer uTests, detectedFaultsCT, expFCountCT, faultIndex; 
+integer tmp, newDiscovered, coverage, detectedFaultsAT; 
+integer keepedCT, totalCT;
+
+
+c5315_net FUT(g[1], g[2], g[3], g[4], g[5], g[6], g[7], g[8], g[9], g[10], 
+	g[11], g[12], g[13], g[14], g[15], g[16], g[17], g[18], g[19], g[20], 
+	g[21], g[22], g[23], g[24], g[25], g[26], g[27], g[28], g[29], g[30], 
+	g[31], g[32], g[33], g[34], g[35], g[36], g[37], g[38], g[39], g[40], 
+	g[41], g[42], g[43], g[44], g[45], g[46], g[47], g[48], g[49], g[50], 
+	g[51], g[52], g[53], g[54], g[55], g[56], g[57], g[58], g[59], g[60], 
+	g[61], g[62], g[63], g[64], g[65], g[66], g[67], g[68], g[69], g[70],
+	g[71], g[72], g[73], g[74], g[75], g[76], g[77], g[78], g[79], g[80], 
+	g[81], g[82], g[83], g[84], g[85], g[86], g[87], g[88], g[89], g[90], 
+	g[91], g[92], g[93], g[94], g[95], g[96], g[97], g[98], g[99], g[100], 
+	g[101], g[102], g[103], g[104], g[105], g[106], g[107], g[108], g[109],
+	g[110], g[111], g[112], g[113], g[114], g[115], g[116], g[117], g[118], 
+	g[119], g[120], g[121], g[122], g[123], g[124], g[125], g[126], g[127], 
+	g[128], g[129], g[130], g[131], g[132], g[133], g[134], g[135], g[136], 
+	g[137], g[138], g[139], g[140], g[141], g[142], g[143], g[144], g[145], 
+	g[146], g[147], g[148], g[149], g[150], g[151], g[152], g[153], g[154], 
+	g[155], g[156], g[157], g[158], g[159], g[160], g[161], g[162], g[163], 
+	g[164], g[165], g[166], g[167], g[168], g[169], g[170], g[171], g[172], 
+	g[173], g[174], g[175], g[176], g[177], g[178], 
+	o[0] ,o[1], o[2], o[3], o[4], o[5], o[6], o[7], o[8], o[9], o[10], 
+	o[11], o[12], o[13], o[14], o[15], o[16], o[17], o[18], o[19], o[20], 
+	o[21], o[22], o[23], o[24], o[25], o[26], o[27], o[28], o[29], o[30], 
+	o[31], o[32], o[33], o[34], o[35], o[36], o[37], o[38], o[39], o[40], 
+	o[41], o[42], o[43], o[44], o[45], o[46], o[47], o[48], o[49], o[50], 
+	o[51], o[52], o[53], o[54], o[55], o[56], o[57], o[58], o[59], o[60], 
+	o[61], o[62], o[63], o[64], o[65], o[66], o[67], o[68], o[69], o[70], 
+	o[71], o[72], o[73], o[74], o[75], o[76], o[77], o[78], o[79], o[80], 
+	o[81], o[82], o[83], o[84], o[85], o[86], o[87], o[88], o[89], o[90], 
+	o[91], o[92], o[93], o[94], o[95], o[96], o[97], o[98], o[99], o[100], 
+	o[101], o[102], o[103], o[104], o[105], o[106], o[107], o[108], o[109],
+	o[110], o[111], o[112], o[113], o[114], o[115], o[116], o[117], o[118],
+	o[119], o[120], o[121], o[122]);
+	
+	c5315_net GUT(g[1], g[2], g[3], g[4], g[5], g[6], g[7], g[8], g[9], g[10], 
+	g[11], g[12], g[13], g[14], g[15], g[16], g[17], g[18], g[19], g[20], 
+	g[21], g[22], g[23], g[24], g[25], g[26], g[27], g[28], g[29], g[30], 
+	g[31], g[32], g[33], g[34], g[35], g[36], g[37], g[38], g[39], g[40], 
+	g[41], g[42], g[43], g[44], g[45], g[46], g[47], g[48], g[49], g[50], 
+	g[51], g[52], g[53], g[54], g[55], g[56], g[57], g[58], g[59], g[60], 
+	g[61], g[62], g[63], g[64], g[65], g[66], g[67], g[68], g[69], g[70],
+	g[71], g[72], g[73], g[74], g[75], g[76], g[77], g[78], g[79], g[80], 
+	g[81], g[82], g[83], g[84], g[85], g[86], g[87], g[88], g[89], g[90], 
+	g[91], g[92], g[93], g[94], g[95], g[96], g[97], g[98], g[99], g[100], 
+	g[101], g[102], g[103], g[104], g[105], g[106], g[107], g[108], g[109],
+	g[110], g[111], g[112], g[113], g[114], g[115], g[116], g[117], g[118], 
+	g[119], g[120], g[121], g[122], g[123], g[124], g[125], g[126], g[127], 
+	g[128], g[129], g[130], g[131], g[132], g[133], g[134], g[135], g[136], 
+	g[137], g[138], g[139], g[140], g[141], g[142], g[143], g[144], g[145], 
+	g[146], g[147], g[148], g[149], g[150], g[151], g[152], g[153], g[154], 
+	g[155], g[156], g[157], g[158], g[159], g[160], g[161], g[162], g[163], 
+	g[164], g[165], g[166], g[167], g[168], g[169], g[170], g[171], g[172], 
+	g[173], g[174], g[175], g[176], g[177], g[178],
+	onet[0], onet[1], onet[2], onet[3], onet[4], onet[5], onet[6], onet[7], onet[8], onet[9], onet[10], 
+	onet[11], onet[12], onet[13], onet[14], onet[15], onet[16], onet[17], onet[18], onet[19], onet[20], 
+	onet[21], onet[22], onet[23], onet[24], onet[25], onet[26], onet[27], onet[28], onet[29], onet[30], 
+	onet[31], onet[32], onet[33], onet[34], onet[35], onet[36], onet[37], onet[38], onet[39], onet[40], 
+	onet[41], onet[42], onet[43], onet[44], onet[45], onet[46], onet[47], onet[48], onet[49], onet[50], 
+	onet[51], onet[52], onet[53], onet[54], onet[55], onet[56], onet[57], onet[58], onet[59], onet[60], 
+	onet[61], onet[62], onet[63], onet[64], onet[65], onet[66], onet[67], onet[68], onet[69], onet[70], 
+	onet[71], onet[72], onet[73], onet[74], onet[75], onet[76], onet[77], onet[78], onet[79], onet[80], 
+	onet[81], onet[82], onet[83], onet[84], onet[85], onet[86], onet[87], onet[88], onet[89], onet[90], 
+	onet[91], onet[92], onet[93], onet[94], onet[95], onet[96], onet[97], onet[98], onet[99], onet[100], 
+	onet[101], onet[102], onet[103], onet[104], onet[105], onet[106], onet[107], onet[108], onet[109],
+	onet[110], onet[111], onet[112], onet[113], onet[114], onet[115], onet[116], onet[117], onet[118],
+	onet[119], onet[120], onet[121], onet[122]);
+
+initial 
+	begin
+
+        // faultFile1 = $fopen ("G:/ECE 5724/ECE 5724 Project 3/c5315.flt", "w");
+        // $FaultCollapsing(testbench.FUT,"G:/ECE 5724/ECE 5724 Project 3/c5315.flt");
+        // $fclose(faultFile1);
+	    // #10;
+        // $display("Done Fault File");
+		// #100;
+
+		keepedCT = 0;
+		totalCT = 0;
+        uTests = 0; coverage = 0; 
+		detectedFaultsAT = 0; 
+        faultIndex = 1; detectedListAT = 0; 
+        expFCountCT = initialExpFCount; 
+        testFile = $fopen("c5315-adj.tst", "w"); 
+        #10; 
+
+        while(coverage < desiredCoverage && uTests < utLimit) 
+		begin 
+			detectedFaultsCT = 0; detectedListCT = 0;
+			testVector = $random($time);
+			totalCT = totalCT + 1;
+			uTests = uTests + 1; 
+			faultIndex = 1; 
+			#10; 
+			newDiscovered = 0; 
+            //G:\ECE 5724\ECE 5724 Project 3
+			//faultFile = $fopen ("G:/ECE 5724/ECE 5724 Project 2/c53152.flt", "r");
+			faultFile = $fopen ("G:/ECE 5724/ECE 5724 Project 3/c5315.flt", "r"); 
+			while(!$feof(faultFile))
+			begin // Fault Injection loop 
+				status=$fscanf(faultFile,"%s s@%b\n",wireName,stuckAtVal);  
+                $InjectFault(wireName, stuckAtVal); 
+                g = testVector;  
+				#60;  
+                if(o != onet) 
+				begin 
+					detectedFaultsCT = detectedFaultsCT + 1;  
+					detectedListCT[faultIndex] = 1'b1;  
+					if(detectedListAT[faultIndex] == 0)  
+						newDiscovered = newDiscovered + 1;  
+                end //end of if 
+                $RemoveFault(wireName); 
+				#20;  
+				faultIndex = faultIndex + 1;  
+            end //end of while(!$feof(faultFile)) 
+			$fclose(faultFile);
+          
+            if(newDiscovered < expFCountCT) 
+				tmp = expFCountCT / 2; 
+			else 
+				tmp = (newDiscovered + expFCountCT) / 2; 
+			
+			expFCountCT = tmp;  
+
+            if(newDiscovered >= expFCountCT && (newDiscovered > 0)) 
+			begin 
+				keepedCT = keepedCT + 1;
+				uTests = 0;
+				//detectedFaultsAT = 0; 
+				detectedFaultsAT = detectedFaultsAT + newDiscovered; 
+				for(faultIndex=1; faultIndex<=numOfFaults; faultIndex=faultIndex+1) 
+					if(detectedListCT[faultIndex]==1)
+					begin 
+						$display ("here");
+						detectedListAT[faultIndex] = 1'b1; 
+						
+					end 
+               
+				coverage = 100 * detectedFaultsAT / numOfFaults; 
+				$fdisplay(testFile, "%b", testVector); 
+           end
+        
+        #10; 
+    end //end of while of Coverage 
+		$display("Number of Random Vectors Generated: %d", uTests); 
+		$display("%d of total %d test vectors are kept!", keepedCT, totalCT);  
+        $display("Coverage : %d", coverage); 
+	$fclose(testFile);
+    end //end of initial 
+endmodule 
