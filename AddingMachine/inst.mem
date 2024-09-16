@@ -1,0 +1,11 @@
+00 lda 1c
+0f dat 0f
+02 add 06
+03 sta 0f
+04 jmp 0c
+1c dat 45
+0c sta 34
+0d jmp 19
+19 lda 34
+1a add 20
+1b sta 22
